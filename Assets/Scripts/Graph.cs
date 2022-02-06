@@ -46,16 +46,21 @@ public class Graph : MonoBehaviour
     {
         var time = Time.time;
         _t += Time.deltaTime * 1f;
-        
         _graphFunction = FunctionLibrary.GetFunction(_currentGraphFunction);
-
-        for (int i = 0; i < _points.Length; i++)
+        var step = 2f / _resolution;
+        
+        for (int i = 0, x = 0, z = 0; i < _points.Length; i++, x++)
         {
-            Transform point = _points[i];
-            Vector3 position = point.localPosition;
+            if (x == _resolution)
+            {
+                x = 0;
+                z++;
+            }
 
-            position.y = _graphFunction.Invoke(position.x, position.z, _t);
-            point.localPosition = position;
+            float u = (x + 0.5f) * step - 1f;
+            float v = (z + 0.5f) * step - 1f;
+
+            _points[i].localPosition = _graphFunction(u, v, _t);
         }
     }
 }
