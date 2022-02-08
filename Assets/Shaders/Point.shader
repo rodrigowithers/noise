@@ -1,18 +1,13 @@
 ﻿Shader "Custom/Point" {
-    Properties {
-        _Color ("Color", Color) = (1,1,1,1)
-        _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _Glossiness ("Smoothness", Range(0,1)) = 0.5
-        _Metallic ("Metallic", Range(0,1)) = 0.0
-    }
+    Properties { }
     SubShader {
         Tags { "RenderType"="Opaque" }
         
         CGPROGRAM
-        #pragma surface surf Standard fullforwardshadows
-        #pragma target 3.0
-
-        sampler2D _MainTex;
+        #pragma surface surf Standard fullforwardshadows addshadow
+        #pragma instancing_options procedural:procedural
+        
+        #pragma target 4.5
 
         struct Input
         {
@@ -20,18 +15,31 @@
             float2 uv_MainTex;
         };
 
-        half _Glossiness;
-        half _Metallic;
-        fixed4 _Color;
 
-        UNITY_INSTANCING_BUFFER_START(Props)
-        UNITY_INSTANCING_BUFFER_END(Props)
+        #if defined UNITY_PROCEDURAL_INSTANCING_ENABLED
 
+        StructuredBuffer<float3> _Positions;
+        float _Step;
+
+        #endif
+
+        void procedural()
+        {
+            #if defined UNITY_PROCEDURAL_INSTANCING_ENABLED
+
+            float3 position = _Positions[unity_InstanceID];
+            
+            unity_ObjectToWorld = 0.0;
+            unity_ObjectToWorld._m03_m13_m23_m33 = float4(positions, 1.0);
+            unity_ObjectToWorld._m00_m11_m22 = _Step;
+            
+            #endif
+        }
+        
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-            o.Albedo.rg = IN.worldPos.xy * 0.5 + 0.5;
+            o.Albedo.rg = saturate(IN.worldPos * 0.5 + 0.5);
             
-            o.Metallic = 0;
             o.Smoothness = 0.5;
             o.Alpha = 1;
         }
