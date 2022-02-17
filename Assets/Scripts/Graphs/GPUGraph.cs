@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 namespace Graphs
 {
@@ -13,10 +14,11 @@ namespace Graphs
         [SerializeField, Range(4, 256)] private int _resolution = 10;
 
         [SerializeField] private ComputeShader _compute;
+        [SerializeField] private Shader _materialShader;
         [SerializeField] private Material _material;
         [SerializeField] private Mesh _mesh;
         
-        private ComputeBuffer _positionBuffer;
+        private ComputeBuffer _positionsBuffer;
 
         private void UpdateFunctionOnGPU()
         {
@@ -27,26 +29,36 @@ namespace Graphs
             _compute.SetFloat(_stepId, step);
             _compute.SetFloat(_timeId, Time.time);
 
-            _compute.SetBuffer(0, _positionsId, _positionBuffer);
+            _material.SetBuffer(_positionsId, _positionsBuffer);
+            _material.SetFloat(_stepId, step);
+            
+            _compute.SetBuffer(0, _positionsId, _positionsBuffer);
             _compute.Dispatch(0, groups, groups, 1);
 
             var bounds = new Bounds(Vector3.zero, Vector3.one * (2f + 2f / _resolution));
-            Graphics.DrawMeshInstancedProcedural(_mesh, 0, _material, bounds, _positionBuffer.count);
+            Graphics.DrawMeshInstancedProcedural(_mesh, 0, _material, bounds, _positionsBuffer.count);
         }
 
         private void OnEnable()
         {
-            _positionBuffer = new ComputeBuffer(_resolution * _resolution, 3 * 4);
+            ShaderWarmup.WarmupShader(_materialShader, new ShaderWarmupSetup());
         }
 
         private void OnDisable()
         {
-            _positionBuffer.Release();
-            _positionBuffer = null;
+            _positionsBuffer.Release();
+            _positionsBuffer = null;
+        }
+
+        private void Start()
+        {
+            _positionsBuffer = new ComputeBuffer(_resolution * _resolution, 3 * 4);
         }
 
         private void Update()
         {
+            
+            
             // _time += Time.deltaTime * 1f;
             // var step = 2f / _resolution;
             //

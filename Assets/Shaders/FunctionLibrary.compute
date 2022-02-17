@@ -1,4 +1,5 @@
 #pragma kernel FunctionKernel
+
 #define PI 3.14159265358979323846
 
 float _Step;
@@ -13,7 +14,7 @@ float2 GetUV(uint3 id)
     return (id.xy + 0.5) * _Step - 1.0;
 }
 
-void SetPosition(uint3 id, float position)
+void SetPosition(uint3 id, float3 position)
 {
     if (id.x < _Resolution && id.y < _Resolution)
     {
@@ -24,13 +25,10 @@ void SetPosition(uint3 id, float position)
 float3 Wave(float u, float v, float t)
 {
     float3 p;
-    
+
     p.x = u;
-    p.y = 0;
-    p.z = 0;
-    
-    // p.y = sin(PI * (u + v + t));
-    // p.z = v;
+    p.y = sin(PI * (u + v + t));
+    p.z = v;
 
     return p;
 }
