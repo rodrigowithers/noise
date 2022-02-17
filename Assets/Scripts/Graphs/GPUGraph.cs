@@ -16,6 +16,8 @@ namespace Graphs
         [SerializeField] private ComputeShader _compute;
         [SerializeField] private Material _material;
         [SerializeField] private Mesh _mesh;
+
+        [SerializeField] private FunctionLibrary.FunctionName _currentGraphFunction;
         
         private ComputeBuffer _positionsBuffer;
 
@@ -23,6 +25,7 @@ namespace Graphs
         {
             float step = 2f / _resolution;
             int groups = Mathf.CeilToInt(_resolution / 8f);
+            var kernelIndex = (int) _currentGraphFunction;
 
             _compute.SetInt(_resolutionId, _resolution);
             _compute.SetFloat(_stepId, step);
@@ -30,9 +33,9 @@ namespace Graphs
 
             _material.SetBuffer(_positionsId, _positionsBuffer);
             _material.SetFloat(_stepId, step);
-            
-            _compute.SetBuffer(0, _positionsId, _positionsBuffer);
-            _compute.Dispatch(0, groups, groups, 1);
+
+            _compute.SetBuffer(kernelIndex, _positionsId, _positionsBuffer);
+            _compute.Dispatch(kernelIndex, groups, groups, 1);
 
             var bounds = new Bounds(Vector3.zero, Vector3.one * (2f + 2f / _resolution));
             Graphics.DrawMeshInstancedProcedural(_mesh, 0, _material, bounds, _resolution * _resolution);

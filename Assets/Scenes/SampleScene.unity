@@ -590,9 +590,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2786a03249dc4107ab3e9402de735450, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _resolution: 256
+  _resolution: 128
   _compute: {fileID: 7200000, guid: e7b1afbb3b3c1464f8fdf3b64f3ee712, type: 3}
-  _materialShader: {fileID: -6465566751694194690, guid: 5efefae7392ad0c4db3fecb3f76a2b09, type: 3}
   _material: {fileID: 2100000, guid: 28dc09909e546db40bf567747c88215e, type: 2}
   _mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &838933962
