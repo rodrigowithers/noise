@@ -11,7 +11,7 @@ namespace Graphs
             _stepId = Shader.PropertyToID("_Step"),
             _timeId = Shader.PropertyToID("_Time");
 
-        [SerializeField, Range(4, 256)] private int _resolution = 10;
+        [SerializeField, Range(4, 1024)] private int _resolution = 10;
 
         [SerializeField] private ComputeShader _compute;
         [SerializeField] private Shader _materialShader;
