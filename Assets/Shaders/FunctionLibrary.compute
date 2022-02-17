@@ -33,10 +33,59 @@ float3 Wave(float u, float v, float t)
     return p;
 }
 
+float3 Ripple(float u, float v, float t)
+{
+    float d = sqrt(u * u + v * v);
+
+    float3 p;
+    p.x = u;
+
+    p.y = sin(PI * (4 * d - t));
+    p.y /= 1 + 10 * d;
+    // p.y *= 0.1f + sin(t);
+
+    p.z = v;
+
+    return p;
+}
+
+float3 Sphere(float u, float v, float t)
+{
+    float r = 0.9f + 0.1f * sin(PI * (6 * u + 4 * v - t));
+    float s = r * cos(0.5f * PI * v);
+
+    float3 p;
+    p.x = s * cos(u * PI);
+    p.y = r * sin(0.5f * v * PI);
+    p.z = s * sin(u * PI);
+
+    return p;
+}
+
+float3 Torus(float u, float v, float t)
+{
+    float r1 = 0.75f + 0.1f * sin(PI * (6 * u + 0.5f * t));
+    float r2 = 0.25f + 0.05f * sin(PI * (8 * u + 4 * v + 2 * t));
+
+    float s = r1 + r2 * cos(PI * v);
+
+    float3 p;
+    p.x = s * sin(PI * u);
+    p.y = r2 * sin(PI * v);
+    p.z = s * cos(PI * u);
+
+    return p;
+}
+
+float3 interpolate(float u, float v, float t)
+{
+    return lerp(Torus(u, v, t), Torus(u, v, t), (sin(t) + 1) / 2);
+}
+
 // Deciding how many threads the method uses
 [numthreads(8, 8, 1)]
 void FunctionKernel(uint3 id : SV_DispatchThreadID)
 {
     float2 uv = GetUV(id);
-    SetPosition(id, Wave(uv.x, uv.y, _Time));
+    SetPosition(id, Torus(uv.x, uv.y, _Time));
 }
