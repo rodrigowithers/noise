@@ -393,7 +393,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3d25bd4534a3489f8dd0dbc34c13ab3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _depth: 6
+  _depth: 3
   _mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   _material: {fileID: 2100000, guid: b226ade50020b4d9a921115d4df1f489, type: 2}
 --- !u!4 &973253371
@@ -439,7 +439,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
