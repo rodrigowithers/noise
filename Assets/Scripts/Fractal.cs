@@ -79,6 +79,22 @@ public class Fractal : MonoBehaviour
 
     private static MaterialPropertyBlock _propertyBlock;
 
+    [ContextMenu("Screenshot")]
+    public void TakeScreenshot()
+    {
+        string folderPath = "Screenshots/";
+ 
+        if (!System.IO.Directory.Exists(folderPath))
+            System.IO.Directory.CreateDirectory(folderPath);
+ 
+        var screenshotName = 
+            "Screenshot_" + 
+            System.DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss") + 
+            ".jpg";
+        ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(folderPath, screenshotName));
+        Debug.Log(folderPath + screenshotName);
+    }
+    
     private FractalPart CreatePart(int childIndex) => new FractalPart
     {
         Direction = _directions[childIndex],
@@ -141,7 +157,7 @@ public class Fractal : MonoBehaviour
 
     private void Update()
     {
-        float angleDelta = 0.1f * PI * Time.deltaTime;
+        float angleDelta = 0.01f * PI * Time.deltaTime;
 
         var rootPart = _parts[0][0];
         rootPart.SpinAngle += angleDelta;

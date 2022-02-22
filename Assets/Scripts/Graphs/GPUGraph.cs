@@ -21,6 +21,22 @@ namespace Graphs
         
         private ComputeBuffer _positionsBuffer;
 
+        [ContextMenu("Screenshot")]
+        public void TakeScreenshot()
+        {
+            string folderPath = "Screenshots/";
+ 
+            if (!System.IO.Directory.Exists(folderPath))
+                System.IO.Directory.CreateDirectory(folderPath);
+ 
+            var screenshotName = 
+                "Screenshot_" + 
+                System.DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss") + 
+                ".jpg";
+            ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(folderPath, screenshotName));
+            Debug.Log(folderPath + screenshotName);
+        }
+
         private void UpdateFunctionOnGPU()
         {
             float step = 2f / _resolution;
@@ -29,7 +45,7 @@ namespace Graphs
 
             _compute.SetInt(_resolutionId, _resolution);
             _compute.SetFloat(_stepId, step);
-            _compute.SetFloat(_timeId, Time.time);
+            _compute.SetFloat(_timeId, Time.time / 2);
 
             _material.SetBuffer(_positionsId, _positionsBuffer);
             _material.SetFloat(_stepId, step);
