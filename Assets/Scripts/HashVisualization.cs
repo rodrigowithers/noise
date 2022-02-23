@@ -4,7 +4,6 @@ using UnityEngine;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Mathematics;
-
 using static Unity.Mathematics.math;
 
 public class HashVisualization : MonoBehaviour
@@ -16,13 +15,16 @@ public class HashVisualization : MonoBehaviour
 
         public int Resolution;
         public float InverseResolution;
-        
+
+        public SmallXXHash Hash;
+
         public void Execute(int index)
         {
-            float v = floor(InverseResolution * index + 0.00001f);
-            float u = index - Resolution * v;
-                
-            Hashes[index] = (uint) (frac(u * v * 0.381f) * 256f);
+            int v = (int)floor(InverseResolution * index + 0.00001f);
+            int u = index - Resolution * v - Resolution / 2;
+            v -= Resolution / 2;
+
+            Hashes[index] = Hash.Eat(u).Eat(v);
         }
     }
 
@@ -32,8 +34,12 @@ public class HashVisualization : MonoBehaviour
 
     [SerializeField] private Mesh _mesh;
     [SerializeField] private Material _material;
+    [SerializeField] private int _seed;
 
-    [SerializeField, Range(1, 512)] private int _resolution = 16;
+    [Space] [SerializeField, Range(1, 512)]
+    private int _resolution = 16;
+
+    [SerializeField, Range(-2, 2)] private float _verticalOffset = 1;
 
     private NativeArray<uint> _hashes;
     private ComputeBuffer _hashesBuffer;
@@ -47,22 +53,24 @@ public class HashVisualization : MonoBehaviour
 
         new HashJob
         {
+            Hash = SmallXXHash.Seed(_seed),
             Hashes = _hashes,
             Resolution = _resolution,
             InverseResolution = 1f / _resolution
         }.ScheduleParallel(_hashes.Length, _resolution, default).Complete();
-        
+
         _hashesBuffer.SetData(_hashes);
 
         _propertyBlock ??= new MaterialPropertyBlock();
         _propertyBlock.SetBuffer(_hashesId, _hashesBuffer);
-        _propertyBlock.SetVector(_configId, new Vector4(_resolution, 1f / _resolution));
+        _propertyBlock.SetVector(_configId, 
+            new Vector4(_resolution, 1f / _resolution, _verticalOffset / _resolution));
     }
 
     private void OnDisable()
     {
         _hashes.Dispose();
-        
+
         _hashesBuffer.Release();
         _hashesBuffer = null;
     }
@@ -70,14 +78,14 @@ public class HashVisualization : MonoBehaviour
     private void OnValidate()
     {
         if (_hashesBuffer == null || !enabled) return;
-        
+
         OnDisable();
         OnEnable();
     }
 
     private void Update()
     {
-        Graphics.DrawMeshInstancedProcedural(_mesh, 0, _material, 
+        Graphics.DrawMeshInstancedProcedural(_mesh, 0, _material,
             new Bounds(Vector3.zero, Vector3.one), _hashes.Length, _propertyBlock);
     }
 }
